@@ -17,17 +17,17 @@ from Modules import chemyx
 
 def ReadOrion():
     try:
-        orion.flushInput()
-        orion.flushOutput()
         orion.write(str.encode('*IDN?\r'))
+        orion.flushInput()
         time.sleep(0.1)
         pH_data = str(orion.read(170))
+        orion.flushOutput()
         trim_pH = re.search('M100,(.+?),pH', pH_data)
         trim_temp = re.search('mV,(.+?),C', pH_data)
         temp = float(trim_temp.group(1))
         pH = float(trim_pH.group(1))
         print(pH_data)
-        return [pH, temp]  
+        return [pH, temp, pH_data]  
            
     except Exception:
         pass
@@ -43,6 +43,7 @@ def Collect(df, filename):
         orion_dat = ReadOrion()
         pH = orion_dat[0]
         temp = orion_dat[1]
+        raw_dat = orion_dat[2]
         
         data = pd.DataFrame({"Key": key,
                           "Time": time.ctime(),
@@ -57,7 +58,8 @@ def Collect(df, filename):
                           "CaCl2": CaCl2, 
                           "CaCO3": CaCO3, 
                           "sol_mass": sol_mass, 
-                          "desig": desig}, index = [0])
+                          "desig": desig,
+                          "Raw_data":raw_dat}, index = [0])
         df = df.append(data) 
         
         data.to_csv(filename, mode='a', header=False, index=False)
@@ -67,7 +69,6 @@ def Collect(df, filename):
     except Exception as e:
         print("Collect error of type: ", e)
         pass
-
 
 def set_lims(num):
     num = float(num)
@@ -104,7 +105,8 @@ expt_data = pd.DataFrame({"Key": key,
                           "CaCl2": CaCl2, 
                           "CaCO3": CaCO3, 
                           "sol_mass": sol_mass, 
-                          "desig": desig})
+                          "desig": desig,
+                          "Raw_data":[]})
 
 expt_data.to_csv(filename, mode='a', header=True, index=False)
 
