@@ -1,0 +1,67 @@
+---
+title: "Rate_Analysis"
+author: "dh"
+date: "3 June 2019"
+output: word_document
+---
+---
+title: "Experimental Analysis"
+output: html_notebook
+---
+
+R Notebook for calculating precipitation rate from experimental data.
+
+The first chunk loads the required packages and uses the CalcStat function to load all data from the data_path and then perform a series of calculations to determine precipitation rate in mol/m2/h
+```{r}
+library(tidyverse)
+library(here)
+library(cowplot)
+library(Cairo)
+
+source("Func_Rate_Calc.R")
+
+SpecificSA <- 0.205 # m2/g
+Series <- "Trial_Series"
+data_path <- here::here(paste0("pH_Stat/Data/Filtered/", Series))
+
+# Calculate rates
+data <- CalcStat(data_path)
+
+# Write to rate_data.csv
+write.csv(data[["rate_data"]],
+          file=here::here(paste0("pH_Stat/Output/",Series,"/rate_data.csv")),
+          row.names = FALSE)
+
+```
+
+This chunk creates stacked plots of pH, titrant volume added, and log rate for the raw data and data which has had the first 1 h trimmed.
+```{r}
+
+tri_plot(data[["raw_data"]], here::here(paste0("pH_Stat/Figs/", Series, "/Raw")))
+
+tri_plot(data[["trim_data"]], here::here(paste0("pH_Stat/Figs/", Series, "/Trimmed")))
+
+```
+
+
+```{r}
+#Preliminary plotting
+Alkalinity <- read_csv(here::here(paste0("Autotitrator/Output/", Series ,"/alkalinity_data.csv")))
+Rate <- data[["rate_data"]]
+Combined <- full_join(Alkalinity, Rate, by = "Key")
+
+plotcomp <- ggplot(data = filter(Combined)) +
+  geom_point(aes(x = Alk_meq_L_mean, y = log_Rate_mol_m2_h, colour = Designation), size = 3.5) +
+  geom_errorbarh(aes(y = log_Rate_mol_m2_h, xmax = Alk_meq_L_mean + Alk_meq_L_sd, xmin = Alk_meq_L_mean - Alk_meq_L_sd))+
+  theme_bw()+
+  scale_colour_manual("Titr Conc", values = DH_Cols) +
+  theme(aspect.ratio = 1) +
+  labs(
+    x = bquote("Alk (meq/L)"),
+    y = expression(paste("Log Rate" ~ "(mol", ~ "m"^{-2}, ~ "h"^{"-1"}, ")"))
+  );plotcomp
+
+ ggsave(filename = "Series_Plot.png", plotcomp, path = here::here(paste0("pH_Stat/Figs/", Series)),dpi = 300, width = 15, height = 10, units = "cm", type = "cairo")
+```
+
+

@@ -1,0 +1,61 @@
+---
+title: "Titration Calculation"
+output: html_notebook
+---
+
+```{r}
+################################################
+# Load required packages
+################################################
+
+library(tidyverse)
+library(phreeqc)
+library(here)
+library(cowplot)
+library(broom)
+library(Cairo)
+#library(xlsx)
+#library(xtable)
+
+source("Func_Titr_Calc.R")
+
+SpecificSA <- 0.205 # m2/g
+
+
+################################################
+# Load data-Select the data series to be analysed
+################################################
+
+Series <- "Trial_Series" #The load.Titr.csv function will search the data folder for the subfolfer defined here
+Raw_Alk <- load.Titr.csv(Series)
+  
+#Run Alk.Calc and store as a table called Alkalinity
+Alkalinity1 <- AlkCalc(Raw_Alk)
+  
+
+Alkalinity <- separate(Alkalinity1, Key, into = c("Key", "type"))
+
+
+Alk_Calc<-
+Alkalinity%>%
+  group_by(Key)%>%
+  summarise_all(funs(mean(., na.rm=TRUE),sd(.)))%>%
+  select(Key, Sample_mass_g_mean, Normality_mean, Alk_meq_L_mean, Alk_meq_L_sd);Alk_Calc
+
+write.csv(Alk_Calc, file=here::here(paste0("Autotitrator/Output/",Series,"/alkalinity_data.csv")))
+```
+
+
+
+```{r}
+
+#Create a plot called gran plot
+Gran_plot <- ggplot(data = Raw_Alk, aes(x = Volume_mL, y = F1))+
+          geom_point(alpha = 0.1, na.rm = TRUE)+
+          geom_line(data = Raw_Alk %>% group_by(Key) %>% filter(pH < 3.6), aes(colour = Key))+
+          theme_bw()+
+          theme(aspect.ratio=1, plot.title = element_text(size = 10, face = "bold"));Gran_plot
+  
+ggsave(file=here::here(paste0("Autotitrator/Figs/",Series,"/Cali_plot.png")), dpi = 300, width = 15, height = 10, units = "cm", type="cairo-png") 
+
+```
