@@ -11,18 +11,7 @@ load.Titr.csv <- function(Series){
   column_classes <- c("character", "numeric", "numeric")
   
   Raw_Alk <- lapply(files, function(x) {
-    readr::read_csv(x, col_types = cols(
-      Date = col_character(),
-      Time_s = col_double(),
-      Temp_C = col_double(),
-      pH = col_double(),
-      pH_mV = col_double(),
-      Rate_mL_h = col_double(),
-      Volume_mL = col_double(),
-      Sample_mass_g = col_double(),
-      Key = col_character(),
-      Normality = col_double()
-    ))
+    readr::read_csv(x)
   })
   
   names(Raw_Alk) <- str_replace(file_names, pattern = ".csv", replacement = "")
@@ -34,6 +23,7 @@ load.Titr.csv <- function(Series){
     x <-
       x %>%
       na.omit %>%
+      select(-Date)%>%
       mutate(
         Time_h = Time_s / 3600,
         F1 = (Sample_mass_g + Volume_mL)*(10^-pH)

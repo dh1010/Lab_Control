@@ -46,24 +46,24 @@ def Collect(df, filename):
         raw_dat = orion_dat[2]
         
         data = pd.DataFrame({"Key": key,
-                          "Time": time.ctime(),
-                          "Elapsed": elapsed_time,
+                          "Date": time.ctime(),
+                          "Time_s": elapsed_time,
                           "pH": pH,
-                          "Temp": temp,
-                          "setpoint_pH": setpoint_pH,
+                          "Temp_C": temp,
+                          "Setpoint_pH": setpoint_pH,
                           "Volume_mL": vol,
                           "Rate_mL_h": rate,
-                          "NaHCO3": NaHCO3, 
-                          "Na2CO3": Na2CO3, 
-                          "CaCl2": CaCl2, 
-                          "CaCO3": CaCO3, 
+                          "Mass_of_NaHCO3_g": NaHCO3, 
+                          "Mass_of_Na2CO3_in_titrant_g": Na2CO3, 
+                          "Mass_of_CaCl2_in_titrant_g": CaCl2, 
+                          "Mass_of_Seed_g": CaCO3, 
                           "sol_mass": sol_mass, 
-                          "desig": desig,
+                          "Designation": desig,
                           "Raw_data":raw_dat}, index = [0])
         df = df.append(data) 
         
         data.to_csv(filename, mode='a', header=False, index=False)
-        print(data[["Elapsed", "pH", "setpoint_pH", "Volume_mL", "Rate_mL_h"]])
+        print(data[["Time_s", "pH", "Setpoint_pH", "Volume_mL", "Rate_mL_h"]])
         return [elapsed_time, pH, setpoint_pH, vol, rate]
         
     except Exception as e:
@@ -90,22 +90,22 @@ CaCl2 = input("CaCl2 Titrant mass (g): ")
 CaCO3 = input("CaCO3 Seed mass (g): ")
 sol_mass = input("Solution mass (g): ")
 desig = input("Experimental Designation: ")
-filename = key +".csv"
+filename = "Stat_" + key +".csv"
 
 expt_data = pd.DataFrame({"Key": key,
-                          "Time": time.ctime(),
-                          "Elapsed": [],
+                          "Date": time.ctime(),
+                          "Time_s": [],
                           "pH": [],
-                          "Temp": [],
-                          "setpoint_pH": [],
+                          "Temp_C": [],
+                          "Setpoint_pH": [],
                           "Volume_mL": [],
                           "Rate_mL_h": [],
-                          "NaHCO3": NaHCO3, 
-                          "Na2CO3": Na2CO3, 
-                          "CaCl2": CaCl2, 
-                          "CaCO3": CaCO3, 
+                          "Mass_of_NaHCO3_g": NaHCO3, 
+                          "Mass_of_Na2CO3_in_titrant_g": Na2CO3, 
+                          "Mass_of_CaCl2_in_titrant_g": CaCl2, 
+                          "Mass_of_Seed_g": CaCO3, 
                           "sol_mass": sol_mass, 
-                          "desig": desig,
+                          "Designation": desig,
                           "Raw_data":[]})
 
 expt_data.to_csv(filename, mode='a', header=True, index=False)
@@ -119,13 +119,13 @@ orion = serial.Serial('COM4', baudrate = 9600)
 ### Program loop
 ###############################################################################
 starttime=time.time()
-chemyx.startPump()
-pumpon = True
-rate = 0.25
-chemyx.setRate(0.25)
+#chemyx.startPump()
+pumpon = False
+#rate = 0.25
+#chemyx.setRate(0.25)
 
-setpoint_pH = 8.211 # ReadOrion()[0]
-pH = setpoint_pH
+setpoint_pH = ReadOrion()[0]
+pH = 8.125
 
 try:
     while True: 
@@ -151,7 +151,7 @@ try:
                     
                 
                 elif pumpon == False:
-                    if diff > 0.2:
+                    if adiff > 0.2:
                         chemyx.startPump()
                         rate = 0.25
                         chemyx.setRate(rate)

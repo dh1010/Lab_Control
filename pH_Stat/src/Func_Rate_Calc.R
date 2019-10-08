@@ -32,24 +32,7 @@ CalcStat <- function(path){
   # Adjust raw data
   
   raw_data <- lapply(my_files, function(x){
-    readr::read_csv(x, col_types = cols(
-      Date = col_character(),
-      Time_s = col_double(),
-      Temp_C = col_double(),
-      pH = col_double(),
-      pH_mV = col_double(),
-      ch_2 = col_double(),
-      Rate_mL_h = col_double(),
-      Volume_mL = col_double(),
-      Setpoint_pH = col_double(),
-      Mass_of_NaHCO3_g = col_double(),
-      Mass_of_Na2CO3_in_titrant_g = col_double(),
-      Mass_of_CaCl2_in_titrant_g = col_double(),
-      Mass_of_Seed_g = col_double(),
-      Mass_of_Solution_g = col_integer(),
-      Key = col_integer(),
-      Designation = col_character()
-    ))
+    readr::read_csv(x)
   }
   )
   

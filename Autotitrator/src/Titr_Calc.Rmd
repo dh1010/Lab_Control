@@ -26,7 +26,7 @@ SpecificSA <- 0.205 # m2/g
 # Load data-Select the data series to be analysed
 ################################################
 
-Series <- "Trial_Series" #The load.Titr.csv function will search the data folder for the subfolfer defined here
+Series <- "Series_3" #The load.Titr.csv function will search the data folder for the subfolfer defined here
 Raw_Alk <- load.Titr.csv(Series)
   
 #Run Alk.Calc and store as a table called Alkalinity

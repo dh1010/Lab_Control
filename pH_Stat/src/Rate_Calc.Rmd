@@ -21,7 +21,7 @@ library(Cairo)
 source("Func_Rate_Calc.R")
 
 SpecificSA <- 0.205 # m2/g
-Series <- "Trial_Series"
+Series <- "Series_3"
 data_path <- here::here(paste0("pH_Stat/Data/Filtered/", Series))
 
 # Calculate rates
