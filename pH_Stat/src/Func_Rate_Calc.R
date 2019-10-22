@@ -64,7 +64,7 @@ CalcStat <- function(path){
     x <-
       x %>%
       # na.omit() %>%
-      filter(Time_s > 3600) %>%
+      filter(Time_s > 3600 * 4) %>%
       mutate(
         Time_h = Time_s / 3600,
         TitrantConc_mol = mean(c((first((Mass_of_Na2CO3_in_titrant_g * 20) / 105.99)), (first((Mass_of_CaCl2_in_titrant_g * 20) / 147.02)))),

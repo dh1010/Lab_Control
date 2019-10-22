@@ -119,13 +119,13 @@ orion = serial.Serial('COM4', baudrate = 9600)
 ### Program loop
 ###############################################################################
 starttime=time.time()
-#chemyx.startPump()
-pumpon = False
-#rate = 0.25
-#chemyx.setRate(0.25)
+chemyx.startPump()
+pumpon = True
+rate = 0.25
+chemyx.setRate(0.25)
 
 setpoint_pH = ReadOrion()[0]
-pH = 8.125
+pH = ReadOrion()[0] 
 
 try:
     while True: 
@@ -157,7 +157,6 @@ try:
                         chemyx.setRate(rate)
                         pumpon = True
                         time.sleep(0.5)
-        
 
         time.sleep(30.0 - (elapsed_time % 30.0))
         
